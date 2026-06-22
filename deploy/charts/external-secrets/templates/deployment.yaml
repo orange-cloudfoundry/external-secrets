@@ -61,7 +61,6 @@ spec:
           {{- end }}
           {{- if .Values.watchNamespaces }}
           - --watch-namespaces={{join "," .Values.watchNamespaces}}
-          - --enable-secrets-caching=true
           {{- end }}
           {{- if or (and .Values.scopedNamespace .Values.scopedRBAC) .Values.watchNamespaces }}
           - --enable-cluster-store-reconciler=false
