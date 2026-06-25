@@ -157,8 +157,8 @@ var rootCmd = &cobra.Command{
 			mgrOpts.Cache.DefaultNamespaces = map[string]cache.Config{
 				namespace: {},
 			}
+		// Multi-namespace mode limited to specific list of namespaces
 		} else if len(watchNamespaces) > 0 {
-			// Cluster-scoped mode but limited to specific namespaces
 			nsMap := make(map[string]cache.Config, len(watchNamespaces))
 			for _, ns := range watchNamespaces {
 				nsMap[ns] = cache.Config{}
@@ -177,7 +177,7 @@ var rootCmd = &cobra.Command{
 		// if we are already caching all secrets, we don't need to use the special client.
 		secretClient := mgr.GetClient()
 		if enableManagedSecretsCache && !enableSecretsCache {
-			secretClient, err = ctrlcommon.BuildManagedSecretClient(mgr, namespace)
+			secretClient, err = ctrlcommon.BuildManagedSecretClient(mgr, namespace, watchNamespaces)
 			if err != nil {
 				setupLog.Error(err, "unable to create managed secret client")
 				os.Exit(1)
@@ -337,7 +337,7 @@ func init() {
 	rootCmd.Flags().BoolVar(&enableFloodGate, "enable-flood-gate", true, "Enable flood gate. External secret will be reconciled only if the ClusterStore or Store have an healthy or unknown state.")
 	rootCmd.Flags().BoolVar(&enableGeneratorState, "enable-generator-state", true, "Whether the Controller should manage GeneratorState")
 	rootCmd.Flags().BoolVar(&enableExtendedMetricLabels, "enable-extended-metric-labels", false, "Enable recommended kubernetes annotations as labels in metrics.")
-	rootCmd.Flags().StringSliceVar(&watchNamespaces, "watch-namespaces", nil, "Comma-separated list of namespaces to limit ESO to watch only the provided list of namespaces when deployed in cluster wide mode instead of watching all the namespaces which is the default behavior")
+	rootCmd.Flags().StringSliceVar(&watchNamespaces, "watch-namespaces", nil, "Comma-separated list of namespaces to limit ESO to watch only the provided list of namespaces when deployed in multi-namespace mode instead of watching all the namespaces which is the default behavior")
 	fs := feature.Features()
 	for _, f := range fs {
 		rootCmd.Flags().AddFlagSet(f.Flags)
